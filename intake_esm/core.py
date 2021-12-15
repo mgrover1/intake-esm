@@ -37,10 +37,10 @@ class esm_datastore(Catalog):
     read_csv_kwargs : dict, optional
         Additional keyword arguments passed through to the :py:func:`~pandas.read_csv` function.
     storage_options : dict, optional
-            Parameters passed to the backend file-system such as Google Cloud Storage,
-            Amazon Web Service S3.
+        Parameters passed to the backend file-system such as Google Cloud Storage,
+        Amazon Web Service S3.
     intake_kwargs: dict, optional
-            Additional keyword arguments are passed through to the :py:class:`~intake.catalog.Catalog` base class.
+        Additional keyword arguments are passed through to the :py:class:`~intake.catalog.Catalog` base class.
 
     Examples
     --------
@@ -202,6 +202,7 @@ class esm_datastore(Catalog):
                     variable_column_name=self.esmcat.aggregation_control.variable_column_name,
                     path_column_name=self.esmcat.assets.column_name,
                     data_format=self.esmcat.assets.format,
+                    format_column_name=self.esmcat.assets.format_column_name,
                     aggregations=self.esmcat.aggregation_control.aggregations,
                     intake_kwargs={'metadata': {}},
                 )
@@ -344,7 +345,7 @@ class esm_datastore(Catalog):
                 .reset_index(drop=True)
             )
 
-        cat = esm_datastore({'esmcat': self.esmcat.dict(), 'df': esmcat_results})
+        cat = self.__class__({'esmcat': self.esmcat.dict(), 'df': esmcat_results})
         if self.esmcat.has_multiple_variable_assets:
             requested_variables = query.get(
                 self.esmcat.aggregation_control.variable_column_name, []
@@ -457,7 +458,7 @@ class esm_datastore(Catalog):
         preprocess : callable, optional
             If provided, call this function on each dataset prior to aggregation.
         storage_options : dict, optional
-            Parameters passed to the backend file-system such as Google Cloud Storage,
+            fsspec Parameters passed to the backend file-system such as Google Cloud Storage,
             Amazon Web Service S3.
         progressbar : bool
             If True, will print a progress bar to standard error (stderr)
@@ -659,13 +660,14 @@ class esm_datastore(Catalog):
 
     def to_dask(self, **kwargs) -> xr.Dataset:
         """
-        Convert result to dataset.
+        Convert result to an xarray dataset.
 
         This is only possible if the search returned exactly one result.
 
         Parameters
         ----------
-        all parameters are forwarded to :py:func:`~intake_esm.esm_datastore.to_dataset_dict`.
+        kwargs: dict
+          Parameters forwarded to :py:func:`~intake_esm.esm_datastore.to_dataset_dict`.
 
         Returns
         -------
