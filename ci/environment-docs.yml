@@ -8,17 +8,18 @@ dependencies:
   - ecgtools >=2022.10.7
   - fsspec>=2023.05
   - gcsfs >=2023.05
-  - intake>=0.7
+  - intake<2.0
   - jupyterlab
   - matplotlib
   - myst-nb
   - netcdf4!=1.6.1
+  - pandas>=2.1.0
   - pip
   - pydantic>=2.0
   - python-graphviz
   - python=3.11
   - s3fs >=2023.05
-  - sphinx
+  - sphinx<6.0
   - sphinx-copybutton
   - sphinx-design
   - watermark

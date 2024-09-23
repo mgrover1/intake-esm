@@ -60,7 +60,7 @@ class esm_datastore(Catalog):
     can be accessed with `intake.open_esm_datastore()`:
 
     >>> import intake
-    >>> url = "https://storage.googleapis.com/cmip6/pangeo-cmip6.json"
+    >>> url = 'https://storage.googleapis.com/cmip6/pangeo-cmip6.json'
     >>> cat = intake.open_esm_datastore(url)
     >>> cat.df.head()
     activity_id institution_id source_id experiment_id  ... variable_id grid_label                                             zstore dcpp_init_year
@@ -76,11 +76,11 @@ class esm_datastore(Catalog):
 
     def __init__(
         self,
-        obj: typing.Union[pydantic.FilePath, pydantic.AnyUrl, dict[str, typing.Any]],
+        obj: pydantic.FilePath | pydantic.AnyUrl | dict[str, typing.Any],
         *,
         progressbar: bool = True,
         sep: str = '.',
-        registry: typing.Optional[DerivedVariableRegistry] = None,
+        registry: DerivedVariableRegistry | None = None,
         read_csv_kwargs: dict[str, typing.Any] = None,
         columns_with_iterables: list[str] = None,
         storage_options: dict[str, typing.Any] = None,
@@ -155,7 +155,7 @@ class esm_datastore(Catalog):
         --------
 
         >>> import intake
-        >>> cat = intake.open_esm_datastore("./tests/sample-catalogs/cesm1-lens-netcdf.json")
+        >>> cat = intake.open_esm_datastore('./tests/sample-catalogs/cesm1-lens-netcdf.json')
         >>> cat.keys_info()
                         component experiment stream
         key
@@ -209,7 +209,7 @@ class esm_datastore(Catalog):
             _ = self[key]
         return self._entries
 
-    @pydantic.validate_arguments
+    @pydantic.validate_call
     def __getitem__(self, key: str) -> ESMDataSource:
         """
         This method takes a key argument and return a data source
@@ -233,8 +233,8 @@ class esm_datastore(Catalog):
 
         Examples
         --------
-        >>> cat = intake.open_esm_datastore("mycatalog.json")
-        >>> data_source = cat["AerChemMIP.BCC.BCC-ESM1.piClim-control.AERmon.gn"]
+        >>> cat = intake.open_esm_datastore('mycatalog.json')
+        >>> data_source = cat['AerChemMIP.BCC.BCC-ESM1.piClim-control.AERmon.gn']
         """
         # The canonical unique key is the key of a compatible group of assets
         try:
@@ -328,10 +328,10 @@ class esm_datastore(Catalog):
     def _ipython_key_completions_(self):
         return self.__dir__()
 
-    @pydantic.validate_arguments
+    @pydantic.validate_call
     def search(
         self,
-        require_all_on: typing.Optional[typing.Union[str, list[str]]] = None,
+        require_all_on: str | list[str] | None = None,
         **query: typing.Any,
     ):
         """Search for entries in the catalog.
@@ -354,7 +354,7 @@ class esm_datastore(Catalog):
         Examples
         --------
         >>> import intake
-        >>> cat = intake.open_esm_datastore("pangeo-cmip6.json")
+        >>> cat = intake.open_esm_datastore('pangeo-cmip6.json')
         >>> cat.df.head(3)
         activity_id institution_id source_id  ... grid_label                                             zstore dcpp_init_year
         0  AerChemMIP            BCC  BCC-ESM1  ...         gn  gs://cmip6/AerChemMIP/BCC/BCC-ESM1/ssp370/r1i1...            NaN
@@ -362,11 +362,11 @@ class esm_datastore(Catalog):
         2  AerChemMIP            BCC  BCC-ESM1  ...         gn  gs://cmip6/AerChemMIP/BCC/BCC-ESM1/ssp370/r1i1...            NaN
 
         >>> sub_cat = cat.search(
-        ...     source_id=["BCC-CSM2-MR", "CNRM-CM6-1", "CNRM-ESM2-1"],
-        ...     experiment_id=["historical", "ssp585"],
-        ...     variable_id="pr",
-        ...     table_id="Amon",
-        ...     grid_label="gn",
+        ...     source_id=['BCC-CSM2-MR', 'CNRM-CM6-1', 'CNRM-ESM2-1'],
+        ...     experiment_id=['historical', 'ssp585'],
+        ...     variable_id='pr',
+        ...     table_id='Amon',
+        ...     grid_label='gn',
         ... )
         >>> sub_cat.df.head(3)
             activity_id institution_id    source_id  ... grid_label                                             zstore dcpp_init_year
@@ -379,7 +379,7 @@ class esm_datastore(Catalog):
 
         >>> import re
         >>> # Let's search for variables containing "Frac" in their name
-        >>> pat = re.compile(r"Frac")  # Define a regular expression
+        >>> pat = re.compile(r'Frac')  # Define a regular expression
         >>> cat.search(variable_id=pat)
         >>> cat.df.head().variable_id
         0     residualFrac
@@ -443,15 +443,15 @@ class esm_datastore(Catalog):
             cat.derivedcat = self.derivedcat
         return cat
 
-    @pydantic.validate_arguments
+    @pydantic.validate_call
     def serialize(
         self,
         name: pydantic.StrictStr,
-        directory: typing.Optional[typing.Union[pydantic.DirectoryPath, pydantic.StrictStr]] = None,
+        directory: pydantic.DirectoryPath | pydantic.StrictStr | None = None,
         catalog_type: str = 'dict',
-        to_csv_kwargs: typing.Optional[dict[typing.Any, typing.Any]] = None,
-        json_dump_kwargs: typing.Optional[dict[typing.Any, typing.Any]] = None,
-        storage_options: typing.Optional[dict[str, typing.Any]] = None,
+        to_csv_kwargs: dict[typing.Any, typing.Any] | None = None,
+        json_dump_kwargs: dict[typing.Any, typing.Any] | None = None,
+        storage_options: dict[str, typing.Any] | None = None,
     ) -> None:
         """Serialize catalog to corresponding json and csv files.
 
@@ -479,14 +479,14 @@ class esm_datastore(Catalog):
         Examples
         --------
         >>> import intake
-        >>> cat = intake.open_esm_datastore("pangeo-cmip6.json")
+        >>> cat = intake.open_esm_datastore('pangeo-cmip6.json')
         >>> cat_subset = cat.search(
-        ...     source_id="BCC-ESM1",
-        ...     grid_label="gn",
-        ...     table_id="Amon",
-        ...     experiment_id="historical",
+        ...     source_id='BCC-ESM1',
+        ...     grid_label='gn',
+        ...     table_id='Amon',
+        ...     experiment_id='historical',
         ... )
-        >>> cat_subset.serialize(name="cmip6_bcc_esm1", catalog_type="file")
+        >>> cat_subset.serialize(name='cmip6_bcc_esm1', catalog_type='file')
         """
 
         self.esmcat.save(
@@ -505,7 +505,7 @@ class esm_datastore(Catalog):
         Examples
         --------
         >>> import intake
-        >>> cat = intake.open_esm_datastore("pangeo-cmip6.json")
+        >>> cat = intake.open_esm_datastore('pangeo-cmip6.json')
         >>> cat.nunique()
         activity_id          10
         institution_id       23
@@ -537,15 +537,15 @@ class esm_datastore(Catalog):
             )
         return unique
 
-    @pydantic.validate_arguments
+    @pydantic.validate_call
     def to_dataset_dict(
         self,
-        xarray_open_kwargs: typing.Optional[dict[str, typing.Any]] = None,
-        xarray_combine_by_coords_kwargs: typing.Optional[dict[str, typing.Any]] = None,
-        preprocess: typing.Optional[typing.Callable] = None,
-        storage_options: typing.Optional[dict[pydantic.StrictStr, typing.Any]] = None,
-        progressbar: typing.Optional[pydantic.StrictBool] = None,
-        aggregate: typing.Optional[pydantic.StrictBool] = None,
+        xarray_open_kwargs: dict[str, typing.Any] | None = None,
+        xarray_combine_by_coords_kwargs: dict[str, typing.Any] | None = None,
+        preprocess: typing.Callable | None = None,
+        storage_options: dict[pydantic.StrictStr, typing.Any] | None = None,
+        progressbar: pydantic.StrictBool | None = None,
+        aggregate: pydantic.StrictBool | None = None,
         skip_on_error: pydantic.StrictBool = False,
         **kwargs,
     ) -> dict[str, xr.Dataset]:
@@ -583,18 +583,18 @@ class esm_datastore(Catalog):
         Examples
         --------
         >>> import intake
-        >>> cat = intake.open_esm_datastore("glade-cmip6.json")
+        >>> cat = intake.open_esm_datastore('glade-cmip6.json')
         >>> sub_cat = cat.search(
-        ...     source_id=["BCC-CSM2-MR", "CNRM-CM6-1", "CNRM-ESM2-1"],
-        ...     experiment_id=["historical", "ssp585"],
-        ...     variable_id="pr",
-        ...     table_id="Amon",
-        ...     grid_label="gn",
+        ...     source_id=['BCC-CSM2-MR', 'CNRM-CM6-1', 'CNRM-ESM2-1'],
+        ...     experiment_id=['historical', 'ssp585'],
+        ...     variable_id='pr',
+        ...     table_id='Amon',
+        ...     grid_label='gn',
         ... )
         >>> dsets = sub_cat.to_dataset_dict()
         >>> dsets.keys()
         dict_keys(['CMIP.BCC.BCC-CSM2-MR.historical.Amon.gn', 'ScenarioMIP.BCC.BCC-CSM2-MR.ssp585.Amon.gn'])
-        >>> dsets["CMIP.BCC.BCC-CSM2-MR.historical.Amon.gn"]
+        >>> dsets['CMIP.BCC.BCC-CSM2-MR.historical.Amon.gn']
         <xarray.Dataset>
         Dimensions:    (bnds: 2, lat: 160, lon: 320, member_id: 3, time: 1980)
         Coordinates:
@@ -687,15 +687,15 @@ class esm_datastore(Catalog):
         self.datasets = self._create_derived_variables(datasets, skip_on_error)
         return self.datasets
 
-    @pydantic.validate_arguments
+    @pydantic.validate_call
     def to_datatree(
         self,
-        xarray_open_kwargs: typing.Optional[dict[str, typing.Any]] = None,
-        xarray_combine_by_coords_kwargs: typing.Optional[dict[str, typing.Any]] = None,
-        preprocess: typing.Optional[typing.Callable] = None,
-        storage_options: typing.Optional[dict[pydantic.StrictStr, typing.Any]] = None,
-        progressbar: typing.Optional[pydantic.StrictBool] = None,
-        aggregate: typing.Optional[pydantic.StrictBool] = None,
+        xarray_open_kwargs: dict[str, typing.Any] | None = None,
+        xarray_combine_by_coords_kwargs: dict[str, typing.Any] | None = None,
+        preprocess: typing.Callable | None = None,
+        storage_options: dict[pydantic.StrictStr, typing.Any] | None = None,
+        progressbar: pydantic.StrictBool | None = None,
+        aggregate: pydantic.StrictBool | None = None,
         skip_on_error: pydantic.StrictBool = False,
         levels: list[str] = None,
         **kwargs,
@@ -733,16 +733,16 @@ class esm_datastore(Catalog):
         Examples
         --------
         >>> import intake
-        >>> cat = intake.open_esm_datastore("glade-cmip6.json")
+        >>> cat = intake.open_esm_datastore('glade-cmip6.json')
         >>> sub_cat = cat.search(
-        ...     source_id=["BCC-CSM2-MR", "CNRM-CM6-1", "CNRM-ESM2-1"],
-        ...     experiment_id=["historical", "ssp585"],
-        ...     variable_id="pr",
-        ...     table_id="Amon",
-        ...     grid_label="gn",
+        ...     source_id=['BCC-CSM2-MR', 'CNRM-CM6-1', 'CNRM-ESM2-1'],
+        ...     experiment_id=['historical', 'ssp585'],
+        ...     variable_id='pr',
+        ...     table_id='Amon',
+        ...     grid_label='gn',
         ... )
         >>> dsets = sub_cat.to_datatree()
-        >>> dsets["CMIP/BCC.BCC-CSM2-MR/historical/Amon/gn"].ds
+        >>> dsets['CMIP/BCC.BCC-CSM2-MR/historical/Amon/gn'].ds
         <xarray.Dataset>
         Dimensions:    (bnds: 2, lat: 160, lon: 320, member_id: 3, time: 1980)
         Coordinates:
